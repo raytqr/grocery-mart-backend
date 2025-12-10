@@ -46,3 +46,35 @@ exports.getHistory = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve order history" });
     }
 };
+
+exports.getTransactionById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const transaction = await Transaction.findOne({
+            where: { 
+                id: id, 
+                userId: userId 
+            },
+            include: [
+                {
+                    model: TransactionItem,
+                    include: [{ model: Product }]
+                }
+            ]
+        });
+
+        if (!transaction) {
+            return res.status(404).json({ error: "Transaction not found or unauthorized" });
+        }
+
+        res.json({
+            message: "Transaction details retrieved successfully",
+            data: transaction
+        });
+    } catch (error) {
+        console.error("Get Transaction Detail Error:", error);
+        res.status(500).json({ error: "Failed to retrieve transaction details" });
+    }
+};

@@ -20,4 +20,7 @@ router.post('/checkout', authentication, cartController.checkout);
 // Order History route
 router.get('/history', authentication, transactionController.getHistory);
 
+// Get specific transaction detail
+router.get('/history/:id', authentication, transactionController.getTransactionById);
+
 module.exports = router;

@@ -8,8 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       // Product has many CartItems (Shopping Cart)
       this.hasMany(models.CartItem, { foreignKey: 'productId' });
 
-      // Product juga punya banyak TransactionItem (Riwayat Pembelian)
       this.hasMany(models.TransactionItem, { foreignKey: 'productId' });
+
+      this.hasMany(models.ProductImage, { foreignKey: 'productId', as: 'images' });
     }
   }
   Product.init({
@@ -17,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     price: DataTypes.INTEGER,
     stock: DataTypes.INTEGER,
     description: DataTypes.TEXT,
-    image: DataTypes.STRING // ✅ Ini baris kuncinya
+    image: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Product',

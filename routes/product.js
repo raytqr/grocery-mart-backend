@@ -10,8 +10,9 @@ router.get('/', productController.getProducts);
 // Route for getting a single product by ID (GET /products/:id)
 router.get('/:id', productController.getProductById);
 
-// 2. Sisipkan upload.single('image')
-// 'image' adalah nama field key yang nanti kita pakai di Postman
-router.post('/', authentication, upload.single('image'), productController.createProduct);
+// Route for creating a new product (POST /products)
+// Apply authentication middleware and upload middleware for images
+// 'images' is the field name in the form data, and we allow up to 5 images 
+router.post('/', authentication, upload.array('images', 5), productController.createProduct);
 
 module.exports = router;

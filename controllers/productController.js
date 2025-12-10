@@ -1,4 +1,4 @@
-const { Product } = require('../models');
+const { Product, ProductImage } = require('../models');
 
 exports.getProducts = async (req, res) => {
     try {
@@ -39,26 +39,31 @@ exports.getProductById = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
     try {
-        // 1. Get text data from the request body
         const { name, price, stock, description } = req.body;
 
-        // 2. Get the image filename (Multer puts the file info in req.file)
-        // We use a ternary operator (?) to handle cases where no image is uploaded
-        const imageFilename = req.file ? req.file.filename : null;
-
-        // 3. Create the new product in the database
+        // 1. Buat Produk (Data teks)
         const newProduct = await Product.create({
-            name: name,
-            price: price,
-            stock: stock,
-            description: description,
-            image: imageFilename
+            name, price, stock, description
+        });
+
+        // 2. Simpan Gambar ke tabel ProductImages (jika ada)
+        if (req.files && req.files.length > 0) {
+            const imageEntries = req.files.map(file => ({
+                productId: newProduct.id,
+                imageUrl: file.filename
+            }));
             
+            await ProductImage.bulkCreate(imageEntries);
+        }
+
+        // 3. (BARU) Ambil ulang data produk LENGKAP dengan gambarnya
+        const fullProduct = await Product.findByPk(newProduct.id, {
+            include: [{ model: ProductImage, as: 'images' }] 
         });
 
         res.status(201).json({
-            message: "Product created successfully",
-            data: newProduct
+            message: "Product and images created successfully",
+            data: fullProduct // Kita kirim data yang sudah lengkap
         });
 
     } catch (error) {
